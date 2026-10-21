@@ -15,13 +15,33 @@ from dataclasses import dataclass
 # 1. Comprensiones -----------------------------------------------------------
 def palabras_por_longitud(texto: str) -> dict[int, list[str]]:
     """Agrupa palabras únicas (minúsculas, sin puntuación) por longitud, ordenadas."""
-    raise NotImplementedError
+    texto_minuscula = texto.lower().replace(",", "").replace(".", "").strip()
+    lista_palabras = texto_minuscula.split()
+    grupos = {}
+    for palabra in lista_palabras:
+        longitud_palabra = len(palabra)
+        if longitud_palabra not in grupos:
+            grupos[longitud_palabra] = []
+        if palabra not in grupos[longitud_palabra]:
+            grupos[longitud_palabra].append(palabra)
+    grupos_ordenados = {longitud: sorted(grupos[longitud]) for longitud in sorted(grupos)}
+    return grupos_ordenados
 
 
 # 2. Colecciones -------------------------------------------------------------
 def top_n(frecuencias: Iterable[str], n: int) -> list[tuple[str, int]]:
     """Los n elementos más frecuentes; empate → orden alfabético."""
-    raise NotImplementedError
+    elementos_conteo = {}
+    for frecuencia in frecuencias:
+        if frecuencia not in elementos_conteo:
+            elementos_conteo[frecuencia] = 1
+        else:
+            elementos_conteo[frecuencia] += 1
+    elementos_ordenados = {
+        elemento: elementos_conteo[elemento] for elemento in sorted(elementos_conteo)
+    }
+    lista_tuplas = list(elementos_ordenados.items())
+    return lista_tuplas[:n]
 
 
 # 3. Funciones de orden superior / closures ----------------------------------
