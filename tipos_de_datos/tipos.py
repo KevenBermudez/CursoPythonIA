@@ -22,7 +22,10 @@ def extension(nombre: str) -> str:
     "Informe.Final.PDF" → "pdf"   "Makefile" → ""   ".env" → ""   "archivo." → ""
     Diapositiva: split, rsplit, partition (mire rpartition).
     """
-    raise NotImplementedError
+    nombre_archivo, separador, extension = nombre.rpartition(".")
+    if not nombre_archivo or not separador or not extension:
+        return ""
+    return extension.lower()
 
 
 def sin_version(nombre: str) -> str:
@@ -30,12 +33,12 @@ def sin_version(nombre: str) -> str:
 
     Diapositiva: strip, lstrip, rstrip, removeprefix, removesuffix.
     """
-    raise NotImplementedError
+    return nombre.removeprefix("v2-")
 
 
 def sin_pdf(nombre: str) -> str:
     """3. Quita el sufijo ".pdf" exacto. "spdf.pdf" → "spdf" (con rstrip(".pdf") daría "s")."""
-    raise NotImplementedError
+    return nombre.removesuffix(".pdf")
 
 
 def palabras(texto: str) -> list[str]:
@@ -43,7 +46,7 @@ def palabras(texto: str) -> list[str]:
 
     "  hola   mundo " → ["hola", "mundo"]. Diapositiva: split, rsplit, partition.
     """
-    raise NotImplementedError
+    return texto.split()
 
 
 def campos(linea: str) -> list[str]:
@@ -51,7 +54,7 @@ def campos(linea: str) -> list[str]:
 
     "a, b,,c " → ["a", "b", "", "c"]
     """
-    raise NotImplementedError
+    return [p.strip() for p in linea.split(",")]
 
 
 def clave_valor(linea: str) -> tuple[str, str]:
@@ -59,7 +62,10 @@ def clave_valor(linea: str) -> tuple[str, str]:
 
     "url=http://x?a=1" → ("url", "http://x?a=1")
     """
-    raise NotImplementedError
+    parametro, separador, url = linea.partition("=")
+    if not separador:
+        raise ValueError("falta")
+    return (parametro.strip(), url.strip())
 
 
 def carpeta_y_archivo(ruta: str) -> tuple[str, str]:
@@ -67,7 +73,8 @@ def carpeta_y_archivo(ruta: str) -> tuple[str, str]:
 
     "rrhh/politicas/vacaciones.pdf" → ("rrhh/politicas", "vacaciones.pdf")
     """
-    raise NotImplementedError
+    carpeta, separador, archivo = ruta.rpartition("/")
+    return carpeta, archivo
 
 
 def unir(numeros: list[int], separador: str = ", ") -> str:
@@ -75,7 +82,7 @@ def unir(numeros: list[int], separador: str = ", ") -> str:
 
     Diapositiva: join, el inverso de split.
     """
-    raise NotImplementedError
+    return separador.join(map(str, numeros))
 
 
 # Ordenar, máximos y recorridos ---------------------------------------------------------
@@ -84,7 +91,8 @@ def mejores(puntajes: dict[str, float], k: int) -> list[str]:
 
     Diapositiva: ordenar con sort, sorted y reversed (clave de tupla).
     """
-    raise NotImplementedError
+    ordenado = sorted(puntajes, key=lambda nombre: (-puntajes[nombre], nombre))
+    return ordenado[:k]
 
 
 def mas_largo(textos: list[str]) -> str | None:
@@ -92,7 +100,9 @@ def mas_largo(textos: list[str]) -> str | None:
 
     Diapositiva: sum, min, max.
     """
-    raise NotImplementedError
+    if not textos:
+        return None
+    return max(textos, key=len)
 
 
 def emparejar(preguntas: list[str], respuestas: list[str]) -> list[tuple[str, str]]:
@@ -100,7 +110,7 @@ def emparejar(preguntas: list[str], respuestas: list[str]) -> list[tuple[str, st
 
     Diapositiva: zip y map.
     """
-    raise NotImplementedError
+    return list(zip(preguntas, respuestas, strict=True))
 
 
 def primero_mayor(numeros: list[int], limite: int) -> int | None:
@@ -108,7 +118,7 @@ def primero_mayor(numeros: list[int], limite: int) -> int | None:
 
     Diapositiva: iter y next.
     """
-    raise NotImplementedError
+    return next((numero for numero in numeros if numero > limite), None)
 
 
 # Diccionarios y conjuntos --------------------------------------------------------------
@@ -118,7 +128,10 @@ def sin_repetidos(etiquetas: list[str]) -> list[str]:
     ["RRHH", "legal", "rrhh", "Legal", "nomina"] → ["RRHH", "legal", "nomina"]
     Diapositiva: diccionarios, leer y quitar sin fallar (setdefault) y casefold.
     """
-    raise NotImplementedError
+    sin_repetir = {}
+    for etiqueta in etiquetas:
+        sin_repetir.setdefault(etiqueta.casefold(), etiqueta)
+    return list(sin_repetir.values())
 
 
 def por_inicial(palabras: list[str]) -> dict[str, list[str]]:
@@ -126,7 +139,10 @@ def por_inicial(palabras: list[str]) -> dict[str, list[str]]:
 
     ["Sol", "mar", "sal"] → {"s": ["Sol", "sal"], "m": ["mar"]}
     """
-    raise NotImplementedError
+    por_inicial = {}
+    for palabra in palabras:
+        por_inicial.setdefault(palabra[0].lower(), []).append(palabra)
+    return por_inicial
 
 
 def mas_frecuentes(items: list[str], n: int) -> list[tuple[str, int]]:
@@ -134,7 +150,8 @@ def mas_frecuentes(items: list[str], n: int) -> list[tuple[str, int]]:
 
     Diapositiva: Counter, defaultdict, deque.
     """
-    raise NotImplementedError
+    c = Counter(items)
+    return c.most_common()[:n]
 
 
 # Números, fechas, bytes y JSON ---------------------------------------------------------
@@ -143,7 +160,7 @@ def a_centenas(valor: float) -> int:
 
     Ojo: con la mitad exacta, Python redondea al par (1250 → 1200). Diapositiva: int, float, round.
     """
-    raise NotImplementedError
+    return round(valor, -2)
 
 
 def dias_entre(desde: str, hasta: str) -> int:
@@ -151,7 +168,9 @@ def dias_entre(desde: str, hasta: str) -> int:
 
     Diapositiva: fechas.
     """
-    raise NotImplementedError
+    fecha_desde = date.fromisoformat(desde)
+    fecha_hasta = date.fromisoformat(hasta)
+    return (fecha_hasta - fecha_desde).days
 
 
 def bytes_utf8(texto: str) -> int:
@@ -159,7 +178,7 @@ def bytes_utf8(texto: str) -> int:
 
     Diapositiva: encode, decode y bytes.
     """
-    raise NotImplementedError
+    return len(texto.encode())
 
 
 def a_json(datos: dict[str, Any]) -> str:
@@ -167,4 +186,4 @@ def a_json(datos: dict[str, Any]) -> str:
 
     Diapositiva: JSON, de texto a datos y de vuelta.
     """
-    raise NotImplementedError
+    return json.dumps(datos, ensure_ascii=False, indent=2)

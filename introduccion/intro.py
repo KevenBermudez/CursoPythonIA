@@ -34,6 +34,20 @@ def main() -> None:
     """
     print(saludo("mundo"))
 
+    try:
+        product1 = Producto("Portatil", 100000.15)
+        print(f"Producto 1: {product1.nombre} - {product1.precio_con_iva}")
+        # product2 = Producto("Teclado", -500000)
+    except ValueError as e:
+        print(f"Error: {e!r}")
+
+    @en_mayusculas
+    def presentar(nombre: str, cargo: str = "analista") -> str:
+        """Presenta a una persona."""
+        return f"{nombre}, {cargo}"
+
+    print(presentar("luis", cargo="gerente"))
+
 
 # 2. Bloques y condiciones --------------------------------------------------------------
 def clasificar_temperatura(t: float) -> str:
