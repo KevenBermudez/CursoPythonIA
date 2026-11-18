@@ -39,8 +39,10 @@ class Cita:
     repr(Cita(1, "x"))                          → "Cita(fuente=1, extracto='x')"
     cita.fuente = 2                             → dataclasses.FrozenInstanceError
     """
+
     fuente: int
     extracto: str
+
 
 # 2. Objeto de valor y entidad -----------------------------------------------------------
 # Diapositivas "Dos tipos de objetos en el dominio" y "En código, la diferencia es una línea".
@@ -53,9 +55,11 @@ class Mensaje:
                        comparar: dos mensajes iguales creados en momentos distintos
                        son iguales.
     """
+
     rol: str
     contenido: str
     creado: datetime = field(default_factory=ahora, compare=False)
+
 
 @dataclass
 class Documento:
@@ -69,23 +73,22 @@ class Documento:
     Escriba `__eq__` (compara solo el id) y `__hash__` (devuelve hash(self.id)), para que
     un documento se pueda usar en un set.
     """
+
     titulo: str
     contenido: str
     fuente: str = "manual"
     id: UUID = field(default_factory=uuid4)
 
     def __eq__(self, otro: object) -> bool:
-      return isinstance(otro, Documento) and otro.id == self.id
-    
+        return isinstance(otro, Documento) and otro.id == self.id
+
     def __hash__(self):
         return hash(self.id)
-    
+
     @classmethod
     def desde_archivo(cls, ruta: Path) -> Self:
-      return cls(
-          ruta.stem, 
-          ruta.read_text(encoding="utf-8"), 
-          str(ruta))
+        return cls(ruta.stem, ruta.read_text(encoding="utf-8"), str(ruta))
+
 
 # 3. Validar al nacer, calcular al pedir --------------------------------------------------
 # Diapositiva "Validar al nacer, calcular al pedir".
@@ -103,18 +106,19 @@ class Fragmento:
     #   palabras    → cuántas palabras tiene el texto (separadas por espacios)
 
     def __post_init__(self) -> None:
-      if self.posicion < 0:
-          raise ValueError("Posicion no puede ser negativa")
-      if not self.texto.strip():
-          raise ValueError("Texto no puede ir vacio.")
-    
+        if self.posicion < 0:
+            raise ValueError("Posicion no puede ser negativa")
+        if not self.texto.strip():
+            raise ValueError("Texto no puede ir vacio.")
+
     @property
     def vectorizado(self) -> bool:
-      return self.embedding is not None
-    
+        return self.embedding is not None
+
     @property
     def palabras(self) -> int:
-      return len(self.texto.split()) 
+        return len(self.texto.split())
+
 
 # 4. Que el objeto se comporte como lo que es -----------------------------------------------
 # Diapositiva "Que el objeto se comporte como lo que es".
@@ -137,15 +141,16 @@ class Conversacion:
 
     def __len__(self) -> int:
         return len(self._mensajes)
+
     def __iter__(self) -> Iterator[Mensaje]:
         return iter(self._mensajes)
+
     def __bool__(self) -> bool:
         return bool(self._mensajes)
-    
+
     @property
     def mensajes(self) -> tuple[Mensaje, ...]:
         return tuple(self._mensajes)
-
 
 
 # 5. Constructores con nombre --------------------------------------------------------------
@@ -175,8 +180,10 @@ def buscar(documentos: dict[UUID, Documento], id_doc: UUID) -> Documento:
         return documentos[id_doc]
     except KeyError as e:
         raise DocumentoNoEncontrado(f"Documento no encontrado {id_doc}") from e
-    
+
+
 class ProveedorNoDisponible(ErrorAsistente): ...
+
 
 # 7. Composición: armar con piezas ------------------------------------------------------------
 # Diapositiva "Composición: armar con piezas".
@@ -194,16 +201,16 @@ class ConReintentos:
 
     def __init__(self, interno: ProveedorLLM, intentos: int = 3) -> None:
         if intentos < 1:
-            raise ValueError(f"Intentos no puede ser menor a 1")
+            raise ValueError("Intentos no puede ser menor a 1")
         self.interno = interno
         self.intentos = intentos
         self.nombre = f"{interno.nombre}+reintentos"
 
     def completar(self, pregunta: str) -> str:
-        for n in range(1, self.intentos+1):
+        for n in range(1, self.intentos + 1):
             try:
                 return self.interno.completar(pregunta)
-            except ProveedorNoDisponible as e:
+            except ProveedorNoDisponible:
                 if n == self.intentos:
                     raise
         raise AssertionError("Proveedor no disponible")
@@ -217,18 +224,21 @@ class ProveedorLLM(Protocol):
     `completar(self, pregunta: str) -> str`. Escriba esas dos líneas aquí (el método termina
     en `: ...`, sin cuerpo) y borre esta docstring si quiere.
     """
+
     nombre: str
-    def completar(self, presgunta: str) -> str:...
+
+    def completar(self, presgunta: str) -> str: ...
 
 
 class Eco:
     """Proveedor de prueba: NO hereda de nada. nombre = "eco";
     completar(pregunta) devuelve f"eco: {pregunta}".
     """
+
     nombre = "eco"
+
     def completar(self, pregunta: str) -> str:
         return f"eco: {pregunta}"
-
 
 
 def con_respaldo(principal: ProveedorLLM, respaldo: ProveedorLLM, pregunta: str) -> str:
@@ -238,11 +248,13 @@ def con_respaldo(principal: ProveedorLLM, respaldo: ProveedorLLM, pregunta: str)
     except ProveedorNoDisponible:
         return respaldo.completar(pregunta)
 
+
 """
     m1 = Eco()
     m2 = Eco()
     con_respaldo(m1, m2, "Que dia son las vacaciones")
 """
+
 
 # 9. Código seguro: objetos que se defienden -----------------------------------------------------
 # Diapositiva "Código seguro: objetos que se defienden".
@@ -257,6 +269,7 @@ class ConfigProveedor:
         - api_key vacía          → ValueError
         - temperatura fuera de 0..2 → ValueError
     """
+
     modelo: str
     api_key: str = field(repr=False)
     temperatura: float = 0.2

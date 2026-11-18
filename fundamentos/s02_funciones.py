@@ -33,7 +33,7 @@ def agrupar_por[T, K: Hashable](items: Iterable[T], clave: Callable[[T], K]) -> 
     """Agrupa los items según clave(item), conservando el orden de llegada en cada grupo."""
     grupo = {}
     for item in items:
-      grupo.setdefault(clave(item), []).append(item)
+        grupo.setdefault(clave(item), []).append(item)
     return grupo
 
 
@@ -45,16 +45,18 @@ def limitador(maximo: int) -> Callable[[int], bool]:
     Lanza ValueError si tokens es negativo. Cada limitador es independiente.
     """
     restante = maximo
+
     def consumir(tokens: int) -> bool:
-      nonlocal restante
-      if tokens < 0:
-        raise ValueError("Los tokens no pueden ser negativos.")
-      if tokens > restante:
-          return False
-      restante -= tokens
-      return True
+        nonlocal restante
+        if tokens < 0:
+            raise ValueError("Los tokens no pueden ser negativos.")
+        if tokens > restante:
+            return False
+        restante -= tokens
+        return True
+
     return consumir
-    
+
 
 # 5. Firma explícita y lista de permitidos (código seguro) -------------------
 def construir_consulta(texto: str, /, *, limite: int = 5, **filtros: str) -> dict[str, Any]:
@@ -66,10 +68,10 @@ def construir_consulta(texto: str, /, *, limite: int = 5, **filtros: str) -> dic
     """
     texto = texto.strip()
     if not texto:
-       raise ValueError("La consulta está vacia.")
+        raise ValueError("La consulta está vacia.")
     if not 1 <= limite <= 50:
-       raise ValueError("El limite no esta dentro del rango 1 y 50.")
+        raise ValueError("El limite no esta dentro del rango 1 y 50.")
     no_permitidos = filtros.keys() - FILTROS_PERMITIDOS
     if no_permitidos:
-       raise ValueError(f"Filtros no permitidos: {sorted(no_permitidos)}")
-    return { "texto": texto, "limite": limite, "filtros": filtros }
+        raise ValueError(f"Filtros no permitidos: {sorted(no_permitidos)}")
+    return {"texto": texto, "limite": limite, "filtros": filtros}
